@@ -1,0 +1,10 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  labels:
+    app: web-static
+  name: web-static
+spec:
+  containers:
+    - name: web-stativ
+      image: souljapanic/web:0.3
