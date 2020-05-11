@@ -5,6 +5,19 @@ metadata:
     app: web-static
   name: web-static
 spec:
+  initContainers:
+    - name: get-static
+      image: library/busybox:1.31.1
+      command: ['sh', '-c', 'wget -O- https://tinyurl.com/otus-k8s-intro | sh']
+      volumeMounts:
+        - name: app
+          mountPath: /app
   containers:
-    - name: web-stativ
+    - name: web-static
       image: souljapanic/web:0.3
+      volumeMounts:
+        - name: app
+          mountPath: /app
+  volumes:
+    - name: app
+      emptyDir: {}
