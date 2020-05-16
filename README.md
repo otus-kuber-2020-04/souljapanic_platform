@@ -282,3 +282,55 @@ kubectl port-forward node-exporter-7s2bg 9100:9100 -n monitor
 curl -v localhost:9100/metrics
 ```
 
+### Развёртывание node-exporter на всех узлах:
+
+* Создание SA и проверка:
+
+```
+kubectl apply -f node-exporter-serviceAccount.yaml -n monitor
+
+kubectl get serviceaccounts -n monitor
+```
+
+* Создание cluster role и проверка:
+
+```
+kubectl apply -f node-exporter-clusterRole.yaml -n monitor
+
+kubectl get clusterroles.rbac.authorization.k8s.io
+```
+
+* Roles Bindings и проверка:
+
+```
+kubectl apply -f node-exporter-clusterRoleBinding.yaml
+
+kubectl get clusterrolebindings.rbac.authorization.k8s.io
+```
+
+* Развёртывание node-exporter:
+
+```
+kubectl apply -f node-exporter-daemonset.yaml -n monitor
+```
+
+* Создание сервиса и проверка:
+
+```
+kubectl apply -f node-exporter-service.yaml -n monitor
+
+kubectl get services -n monitor
+```
+
+* Статусы POD'ов:
+
+```
+kubectl get pods -o wide -n monitor
+NAME                  READY   STATUS    RESTARTS   AGE   IP           NODE                  NOMINATED NODE   READINESS GATES
+node-exporter-bgcgr   1/1     Running   0          11m   172.18.0.8   kind-worker3          <none>           <none>
+node-exporter-n5dhw   1/1     Running   0          11m   172.18.0.3   kind-worker           <none>           <none>
+node-exporter-scddd   1/1     Running   0          12m   172.18.0.5   kind-control-plane3   <none>           <none>
+node-exporter-tpmtp   1/1     Running   0          12m   172.18.0.4   kind-control-plane    <none>           <none>
+node-exporter-vq6b5   1/1     Running   0          12m   172.18.0.7   kind-control-plane2   <none>           <none>
+node-exporter-xf9jv   1/1     Running   0          11m   172.18.0.6   kind-worker2          <none>           <none>
+```
