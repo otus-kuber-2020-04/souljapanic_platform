@@ -25,14 +25,14 @@ minikube status
 minikube ssh
 ```
 
-* Провера статуса k8s:
+* Проверка статуса k8s:
 
 ```
 kubectl cluster-info
 kubectl get cs
 ```
 
-* Првоерка статуса POD'ов проекта kube-system:
+* Проверка статуса POD'ов проекта kube-system:
 
 ```
 kubectl get pods -n kube-system
@@ -132,4 +132,60 @@ RECOMMENDATION_SERVICE_ADDR=recommendationservice:8080
 SHIPPING_SERVICE_ADDR=shippingservice:50051
 CHECKOUT_SERVICE_ADDR=checkoutservice:5050
 AD_SERVICE_ADDR=adservice:9555
+```
+
+# kubernetes-controllers
+
+## Настройка окружения:
+
+* Создание кластера:
+
+```
+kind create cluster --config kind-config.yaml
+```
+
+* Список кластеров:
+
+```
+kind get clusters
+```
+
+* Информация о кластере:
+
+```
+kubectl cluster-info --context kind-kind
+```
+
+## ReplicaSet
+
+* Проверка работы ReplicaSet, matchLabels выполняется по app=frontend:
+
+```
+kubectl apply -f frontend-replicaset.yaml -n default
+```
+
+* Увеличение количества replica:
+
+```
+kubectl scale replicaset frontend --replicas=3
+```
+
+* Проверка образа указанного в ReplicaSet:
+
+```
+kubectl get replicaset frontend -o=jsonpath='{.spec.template.spec.containers[0].image}' -n default
+```
+
+* Проверка образа из которого запущен контейнер:
+
+```
+kubectl get pods -l app=frontend -o=jsonpath='{.items[0].spec.containers[0].image}' -n default
+```
+
+### Описание:
+
+```
+ReplicaSet сделит за тем, сколько POD'ов должно быть запущено, значение указано в .spec.replicas
+```
+
 ```
