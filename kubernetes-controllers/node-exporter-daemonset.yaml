@@ -1,0 +1,30 @@
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  labels:
+    app: node-exporter
+    version: 0.18.1
+    type: infra
+  name: node-exporter
+  namespace: monitor
+spec:
+  selector:
+    matchLabels:
+      app: node-exporter
+  template:  
+    metadata:  
+      labels:  
+        app: node-exporter
+        version: 0.18.1
+        type: infra
+      name: node-exporter  
+    spec:  
+      containers:  
+        - image: prom/node-exporter:v0.18.1
+          name: node-exporter
+          ports:
+            - containerPort: 9100
+              hostPort: 9100
+              name: scrape
+      hostNetwork: true
+      hostPID: true

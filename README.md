@@ -260,3 +260,25 @@ kubectl rollout status deployment/frontend --timeout=60s -n default
 kubectl rollout undo deployment/frontend -n default
 ```
 
+## DaemonSet
+
+* Создание namespace:
+
+```
+kubectl create namespace monitor
+```
+
+* Развёртывание node-exporter:
+
+```
+kubectl apply -f node-exporter-daemonset.yaml -n monitor
+```
+
+* Проверка node-exporter:
+
+```
+kubectl port-forward node-exporter-7s2bg 9100:9100 -n monitor
+
+curl -v localhost:9100/metrics
+```
+
