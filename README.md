@@ -390,3 +390,34 @@ kubectl apply -f 03-clusterrole.yaml
 kubectl apply -f 04-clusterrb.yaml
 ```
 
+## task03
+
+* Создание namespace:
+
+```
+kubectl apply -f 01-ns.yaml
+```
+
+* Создание sa jane:
+
+```
+kubectl apply -f 02-sa.yaml
+```
+
+* Назначение роли для jane:
+
+```
+kubectl apply -f 03-rb.yaml
+```
+
+* Создание sa ken:
+
+```
+kubectl apply -f 04-sa.yaml
+```
+
+* Назначение роли для ken:
+
+```
+kubectl apply -f 05-rb.yaml
+```
