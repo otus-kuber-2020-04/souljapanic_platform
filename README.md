@@ -234,3 +234,29 @@ kubectl apply -f paymentservice-deployment-bg.yaml -n default
 kubectl apply -f paymentservice-deployment-reverse.yaml -n default
 ```
 
+## Probes
+
+* Проверка работы readinessProbe:
+
+```
+kubectl apply -f frontend-deployment.yaml -n default
+```
+
+* Просмотр состояние POD'ов:
+
+```
+kubectl describe pod -n default
+```
+
+* Проверка статуса обновления:
+
+```
+kubectl rollout status deployment/frontend --timeout=60s -n default
+```
+
+* Отмена развёртывания с некорректным readinessProbe:
+
+```
+kubectl rollout undo deployment/frontend -n default
+```
+
