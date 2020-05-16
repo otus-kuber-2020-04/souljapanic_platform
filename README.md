@@ -25,14 +25,14 @@ minikube status
 minikube ssh
 ```
 
-* Провера статуса k8s:
+* Проверка статуса k8s:
 
 ```
 kubectl cluster-info
 kubectl get cs
 ```
 
-* Првоерка статуса POD'ов проекта kube-system:
+* Проверка статуса POD'ов проекта kube-system:
 
 ```
 kubectl get pods -n kube-system
@@ -132,4 +132,205 @@ RECOMMENDATION_SERVICE_ADDR=recommendationservice:8080
 SHIPPING_SERVICE_ADDR=shippingservice:50051
 CHECKOUT_SERVICE_ADDR=checkoutservice:5050
 AD_SERVICE_ADDR=adservice:9555
+```
+
+# kubernetes-controllers
+
+## Настройка окружения:
+
+* Создание кластера:
+
+```
+kind create cluster --config kind-config.yaml
+```
+
+* Список кластеров:
+
+```
+kind get clusters
+```
+
+* Информация о кластере:
+
+```
+kubectl cluster-info --context kind-kind
+```
+
+## ReplicaSet
+
+* Проверка работы ReplicaSet, matchLabels выполняется по app=frontend:
+
+```
+kubectl apply -f frontend-replicaset.yaml -n default
+```
+
+* Увеличение количества replica:
+
+```
+kubectl scale replicaset frontend --replicas=3
+```
+
+* Проверка образа указанного в ReplicaSet:
+
+```
+kubectl get replicaset frontend -o=jsonpath='{.spec.template.spec.containers[0].image}' -n default
+```
+
+* Проверка образа из которого запущен контейнер:
+
+```
+kubectl get pods -l app=frontend -o=jsonpath='{.items[0].spec.containers[0].image}' -n default
+```
+
+### Описание:
+
+```
+ReplicaSet сделит за тем, сколько POD'ов должно быть запущено, значение указано в .spec.replicas
+```
+
+## Deployment
+
+* Проверка работы Deployment:
+
+```
+kubectl apply -f paymentservice-deployment.yam -n default
+```
+
+* История Deployment:
+
+```
+kubectl rollout history deployment paymentservice -n default
+```
+
+* Просмотр всех элементов namespace:
+
+```
+kubectl get all -o name -n default
+
+pod/paymentservice-7c8468cf9-hcwts
+pod/paymentservice-7c8468cf9-kkf6k
+pod/paymentservice-7c8468cf9-xvqbx
+service/kubernetes
+deployment.apps/paymentservice
+replicaset.apps/paymentservice-68c65b7974
+replicaset.apps/paymentservice-7c8468cf9
+```
+
+* Возврат к предыдущей версии:
+
+```
+kubectl rollout undo deployment paymentservice --to-revision=1 -n default
+```
+
+* Проверка работы сценария развёртывания blue-green:
+
+```
+kubectl apply -f paymentservice-deployment-bg.yaml -n default
+```
+
+* Проверка работы сценария развёртывания Reverse Rolling Update:
+
+```
+kubectl apply -f paymentservice-deployment-reverse.yaml -n default
+```
+
+## Probes
+
+* Проверка работы readinessProbe:
+
+```
+kubectl apply -f frontend-deployment.yaml -n default
+```
+
+* Просмотр состояние POD'ов:
+
+```
+kubectl describe pod -n default
+```
+
+* Проверка статуса обновления:
+
+```
+kubectl rollout status deployment/frontend --timeout=60s -n default
+```
+
+* Отмена развёртывания с некорректным readinessProbe:
+
+```
+kubectl rollout undo deployment/frontend -n default
+```
+
+## DaemonSet
+
+* Создание namespace:
+
+```
+kubectl create namespace monitor
+```
+
+* Развёртывание node-exporter:
+
+```
+kubectl apply -f node-exporter-daemonset.yaml -n monitor
+```
+
+* Проверка node-exporter:
+
+```
+kubectl port-forward node-exporter-7s2bg 9100:9100 -n monitor
+
+curl -v localhost:9100/metrics
+```
+
+### Развёртывание node-exporter на всех узлах:
+
+* Создание SA и проверка:
+
+```
+kubectl apply -f node-exporter-serviceAccount.yaml -n monitor
+
+kubectl get serviceaccounts -n monitor
+```
+
+* Создание cluster role и проверка:
+
+```
+kubectl apply -f node-exporter-clusterRole.yaml -n monitor
+
+kubectl get clusterroles.rbac.authorization.k8s.io
+```
+
+* Roles Bindings и проверка:
+
+```
+kubectl apply -f node-exporter-clusterRoleBinding.yaml
+
+kubectl get clusterrolebindings.rbac.authorization.k8s.io
+```
+
+* Развёртывание node-exporter:
+
+```
+kubectl apply -f node-exporter-daemonset.yaml -n monitor
+```
+
+* Создание сервиса и проверка:
+
+```
+kubectl apply -f node-exporter-service.yaml -n monitor
+
+kubectl get services -n monitor
+```
+
+* Статусы POD'ов:
+
+```
+kubectl get pods -o wide -n monitor
+NAME                  READY   STATUS    RESTARTS   AGE   IP           NODE                  NOMINATED NODE   READINESS GATES
+node-exporter-bgcgr   1/1     Running   0          11m   172.18.0.8   kind-worker3          <none>           <none>
+node-exporter-n5dhw   1/1     Running   0          11m   172.18.0.3   kind-worker           <none>           <none>
+node-exporter-scddd   1/1     Running   0          12m   172.18.0.5   kind-control-plane3   <none>           <none>
+node-exporter-tpmtp   1/1     Running   0          12m   172.18.0.4   kind-control-plane    <none>           <none>
+node-exporter-vq6b5   1/1     Running   0          12m   172.18.0.7   kind-control-plane2   <none>           <none>
+node-exporter-xf9jv   1/1     Running   0          11m   172.18.0.6   kind-worker2          <none>           <none>
 ```

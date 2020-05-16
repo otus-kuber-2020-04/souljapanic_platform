@@ -1,0 +1,21 @@
+apiVersion: apps/v1
+kind: ReplicaSet
+metadata:
+  name: paymentservice
+  labels:
+    app: paymentservice
+    type: hipster
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: paymentservice
+  template:
+    metadata:
+      labels:
+        app: paymentservice
+        type: hipster
+    spec:
+      containers:
+        - name: server
+          image: souljapanic/paymentservice:0.1
