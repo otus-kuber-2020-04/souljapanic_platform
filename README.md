@@ -188,4 +188,49 @@ kubectl get pods -l app=frontend -o=jsonpath='{.items[0].spec.containers[0].imag
 ReplicaSet сделит за тем, сколько POD'ов должно быть запущено, значение указано в .spec.replicas
 ```
 
+## Deployment
+
+* Проверка работы Deployment:
+
 ```
+kubectl apply -f paymentservice-deployment.yam -n default
+```
+
+* История Deployment:
+
+```
+kubectl rollout history deployment paymentservice -n default
+```
+
+* Просмотр всех элементов namespace:
+
+```
+kubectl get all -o name -n default
+
+pod/paymentservice-7c8468cf9-hcwts
+pod/paymentservice-7c8468cf9-kkf6k
+pod/paymentservice-7c8468cf9-xvqbx
+service/kubernetes
+deployment.apps/paymentservice
+replicaset.apps/paymentservice-68c65b7974
+replicaset.apps/paymentservice-7c8468cf9
+```
+
+* Возврат к предыдущей версии:
+
+```
+kubectl rollout undo deployment paymentservice --to-revision=1 -n default
+```
+
+* Проверка работы сценария развёртывания blue-green:
+
+```
+kubectl apply -f paymentservice-deployment-bg.yaml -n default
+```
+
+* Проверка работы сценария развёртывания Reverse Rolling Update:
+
+```
+kubectl apply -f paymentservice-deployment-reverse.yaml -n default
+```
+
