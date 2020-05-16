@@ -367,3 +367,26 @@ bob       1         12m
 dave      1         9s
 default   1         20m
 ```
+
+## task02
+
+* Создание проекта:
+
+```
+kubectl apply -f 01-ns.yaml
+```
+
+* Создание sa carol:
+
+```
+kubectl apply -f 02-sa.yaml
+```
+
+* Создание cluster role и назначение роли:
+
+```
+kubectl apply -f 03-clusterrole.yaml
+
+kubectl apply -f 04-clusterrb.yaml
+```
+
