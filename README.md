@@ -334,3 +334,90 @@ node-exporter-tpmtp   1/1     Running   0          12m   172.18.0.4   kind-contr
 node-exporter-vq6b5   1/1     Running   0          12m   172.18.0.7   kind-control-plane2   <none>           <none>
 node-exporter-xf9jv   1/1     Running   0          11m   172.18.0.6   kind-worker2          <none>           <none>
 ```
+
+# kubernetes-security
+
+## task01
+
+* Создание SA с правами admin в рамках кластера (namespace указан в манифест файлах) и проверка:
+
+```
+kubectl apply -f 01-sa.yaml
+
+kubectl get sa -n default
+NAME      SECRETS   AGE
+bob       1         10m
+default   1         18m
+
+kubectl apply -f 02-rolebinding-sa.yaml
+
+kubectl get clusterrolebindings.rbac.authorization.k8s.io bob
+NAME   ROLE                AGE
+bob    ClusterRole/admin   21m
+```
+
+* Создание SA без прав в рамках кластера и проверка:
+
+```
+kubectl apply -f 03-sa.yaml
+
+kubectl get sa -n default
+NAME      SECRETS   AGE
+bob       1         12m
+dave      1         9s
+default   1         20m
+```
+
+## task02
+
+* Создание проекта:
+
+```
+kubectl apply -f 01-ns.yaml
+```
+
+* Создание sa carol:
+
+```
+kubectl apply -f 02-sa.yaml
+```
+
+* Создание cluster role и назначение роли:
+
+```
+kubectl apply -f 03-clusterrole.yaml
+
+kubectl apply -f 04-clusterrb.yaml
+```
+
+## task03
+
+* Создание namespace:
+
+```
+kubectl apply -f 01-ns.yaml
+```
+
+* Создание sa jane:
+
+```
+kubectl apply -f 02-sa.yaml
+```
+
+* Назначение роли для jane:
+
+```
+kubectl apply -f 03-rb.yaml
+```
+
+* Создание sa ken:
+
+```
+kubectl apply -f 04-sa.yaml
+```
+
+* Назначение роли для ken:
+
+```
+kubectl apply -f 05-rb.yaml
+```
